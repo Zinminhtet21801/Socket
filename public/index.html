@@ -1,12 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
-</head>
-<body>
-    YOOO
-</body>
+    <link rel="stylesheet" href="/css/styles.css" />
+    <script
+      src="https://cdn.socket.io/4.1.2/socket.io.min.js"
+      integrity="sha384-toS6mmwu70G0fw54EGlWWeA4z3dyJ+dlXBtSURSKN4vyRFOcxd3Bzjj/AoOwY+Rg"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body>
+    <div id="app">
+      <h2>chat app</h2>
+      <div id="chat-window">
+        <div id="output"></div>
+        <div id="feedback"></div>
+      </div>
+      <input type="text" placeholder="Name" id="name" />
+      <input type="text" placeholder="Message" id="message" />
+      <button id="send">send</button>
+    </div>
+
+    <script>
+      const socket = io();
+      let output = document.getElementById("output")
+      let message = document.getElementById("message")
+      let name = document.getElementById("name")
+      let send = document.getElementById("send")
+      let feedback = document.getElementById("feedback")
+      send.addEventListener("click",()=>{
+        let data = {
+          name : name.value,
+          message : message.value
+        }
+        name.value = null
+        message.value = null
+        socket.emit("chat",data)
+      })
+
+      message.addEventListener("keypress",()=>{
+        console.log("HI");
+        socket.emit("typing",name.value)
+      })
+
+      socket.on("typing",(data)=>{
+        feedback.innerHTML = data
+        setTimeout(()=>{
+          console.log("TIME");
+          feedback.innerHTML = null
+        },3000)
+      })
+
+      socket.on("chat",(data)=>{
+        feedback.innerHTML = ""
+        output.innerHTML += `<p><strong>${data.name}</strong> : ${data.message}</p>`
+      })
+    </script>
+  </body>
 </html>
